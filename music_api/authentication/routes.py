@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from music_api.forms import UserLoginForm
 from music_api.models import db, User, check_password_hash
 from flask_login import login_user, logout_user, login_required
+from music_api import mail
+from flask_mail import Message
 
 auth = Blueprint('auth', __name__, template_folder='auth_templates')
 
@@ -16,6 +18,10 @@ def signup():
         new_user = User(email, password)
         db.session.add(new_user)
         db.session.commit()
+        #Sending Auto-Email
+        msg = Message("Welcome!", recipients=[email])
+        msg.body = f"Drones are the shit {email} ! Keep reppin drones til the day you die here is your pw: {password}!"
+        mail.send(msg)
         flash(f'You have created an account for {email}', 'create-success')
         return redirect(url_for('auth.signin'))
 
